@@ -1,0 +1,37 @@
+{
+    "instances": [
+        {
+            "id": "pixel-squid",
+            "name": "Pixel Squid",
+            "description": "Instancia con mods, configuraciones y texturas para el servidor de Squid.",
+            "image": "https://tu-enlace.com/banner.png",
+            "version": "1.20.1",
+            "type": "fabric",
+            "java": "17",
+            "mods": [
+                {
+                    "url": "https://tu-enlace.com/modssquid.zip",
+                    "sha1": "c5eacbf94dd70a215928410b472ed030af6b563b",
+                    "path": "mods.zip",
+                    "size": 385459415
+                }
+            ],
+            "config": [
+                {
+                    "url": "https://tu-enlace.com/modssquid.zip",
+                    "sha1": "c5eacbf94dd70a215928410b472ed030af6b563b",
+                    "path": "config.zip",
+                    "size": 385459415
+                }
+            ],
+            "resourcepacks": [
+                {
+                    "url": "https://tu-enlace.com/modssquid.zip",
+                    "sha1": "c5eacbf94dd70a215928410b472ed030af6b563b",
+                    "path": "resourcepacks.zip",
+                    "size": 385459415
+                }
+            ]
+        }
+    ]
+}
