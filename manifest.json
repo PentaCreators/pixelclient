@@ -8,7 +8,7 @@
       "background": "https://github.com/PentaCreators/pixelclient/blob/main/images/prueba.png",
       "buttonText": "JUGAR",
       "version": "1.20.1",
-      "type": "fabric",
+      "type": "forge",
       "java": "17",
       "mods": [
         {
