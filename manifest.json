@@ -4,7 +4,7 @@
       "id": "pixel-squid",
       "name": "Pixel Squid",
       "description": "Instancia completa con mods y texturas.",
-      "image": "https://github.com/PentaCreators/pixelclient/raw/main/assets/card.jpg",
+      "image": "https://raw.githubusercontent.com/PentaCreators/pixelclient/main/images/squidgameportilla.png",
       "background": "https://github.com/PentaCreators/pixelclient/raw/main/assets/fondo.jpg",
       "buttonText": "JUGAR",
       "version": "1.20.1",
