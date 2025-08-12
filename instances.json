@@ -1,0 +1,10 @@
+[
+  {
+    "id": "squid_games",
+    "name": "Squid Games",
+    "description": "¿Podrás sobrevivir a estos juegos?",
+    "background": "https://raw.githubusercontent.com/TU_USUARIO/TU_REPO/main/squid_games/background.png",
+    "cover": "https://raw.githubusercontent.com/TU_USUARIO/TU_REPO/main/squid_games/portada.png",
+    "instance_json": "https://raw.githubusercontent.com/TU_USUARIO/TU_REPO/main/squid_games/instance.json"
+  }
+]
