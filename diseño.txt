@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Client Launcher</title>
+    
+    <style>
+        /* Importación de fuentes de Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        /* Definición de variables CSS para fácil personalización */
+        :root {
+            /* Paleta de Colores */
+            --color-bg-dark: #020617;
+            --color-panel: rgba(15, 23, 42, 0.6);
+            --color-border: rgba(56, 189, 248, 0.2);
+            --color-border-hover: rgba(56, 189, 248, 0.5);
+            --color-text-primary: #f8fafc;
+            --color-text-secondary: #94a3b8;
+            --color-text-title: #e0f2fe;
+            --color-accent-premium: #f59e0b;
+            --color-accent-premium-hover: #fbbf24;
+            --color-accent-offline: #38bdf8;
+            --color-accent-offline-hover: #7dd3fc;
+            --color-discord: #5865F2;
+            --color-discord-hover: #4f5bda;
+            --color-play: #10b981;
+            --color-play-hover: #10f9a1;
+            --color-status-ok: #4ade80;
+            --color-notification-success: rgba(74, 222, 128, 0.9);
+            --color-notification-error: rgba(248, 113, 113, 0.9);
+            --color-notification-info: rgba(96, 165, 250, 0.9);
+
+            /* Tipografía */
+            --font-primary: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            /* Transiciones */
+            --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* --- Reseteo y Estilos Base --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            height: 100vh;
+            width: 100vw;
+            background-color: var(--color-bg-dark);
+            color: var(--color-text-primary);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- Fondos Animados --- */
+        .background-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        /* Fondo de Estrellas */
+        #stars {
+            position: absolute;
+            width: 100%; height: 100%;
+            background: transparent;
+        }
+
+        /* Aurora */
+        .aurora-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            filter: blur(100px) saturate(150%);
+        }
+
+        .aurora-shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        .shape1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, #38bdf8, transparent 60%);
+            animation: move1 25s infinite alternate ease-in-out;
+        }
+
+        .shape2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #818cf8, transparent 60%);
+            animation: move2 30s infinite alternate-reverse ease-in-out;
+        }
+        .shape3 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #c084fc, transparent 60%);
+            animation: move3 20s infinite alternate ease-in-out;
+        }
+
+        @keyframes move1 {
+            from { transform: translate(-20%, -20%) rotate(0deg); }
+            to { transform: translate(60%, 40%) rotate(180deg); }
+        }
+        @keyframes move2 {
+            from { transform: translate(50%, 80%); }
+            to { transform: translate(0%, 10%); }
+        }
+        @keyframes move3 {
+            from { transform: translate(100%, 0%); }
+            to { transform: translate(20%, 100%); }
+        }
+
+        /* --- Contenedor Principal --- */
+        .app-container {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0,0,0,0.1);
+        }
+        
+        /* --- Vistas (Login y Menú Principal) --- */
+        .view {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            display: flex;
+            flex-direction: column;
+        }
+        .view.hidden {
+            opacity: 0;
+            transform: scale(0.98);
+            pointer-events: none;
+        }
+
+        /* --- Header & Footer (Solo para Login) --- */
+        .header, .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 32px;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-color: var(--color-border);
+            flex-shrink: 0;
+        }
+        .header { border-bottom: 1px solid var(--color-border); }
+        .footer { border-top: 1px solid var(--color-border); }
+
+        .logo-section { display: flex; align-items: center; gap: 14px; }
+        
+        .logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .app-title { font-size: 20px; font-weight: 600; color: var(--color-text-title); }
+        .version-badge {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--color-accent-premium-hover);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+        }
+        .footer-info { color: var(--color-text-secondary); font-size: 13px; }
+        .footer-controls { display: flex; align-items: center; gap: 16px; }
+
+        .control-btn {
+            width: 36px; height: 36px;
+            background: transparent;
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center; justify-content: center;
+            transition: var(--transition-smooth);
+            font-size: 16px;
+        }
+        .control-btn:hover {
+            color: var(--color-text-primary);
+            border-color: var(--color-border-hover);
+            background: var(--color-panel);
+            transform: scale(1.05);
+        }
+        .close-btn:hover {
+            color: #f87171;
+            border-color: rgba(248, 113, 113, 0.5);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+        .launcher-panel {
+            background: var(--color-panel);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--color-border);
+            border-radius: 24px;
+            padding: 48px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            transition: var(--transition-smooth);
+        }
+        .launcher-panel:hover {
+            border-color: var(--color-border-hover);
+        }
+        .launcher-title {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #e0f2fe, #7dd3fc);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+            text-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+        }
+        .launcher-subtitle {
+            color: var(--color-text-secondary);
+            font-size: 16px;
+            margin-bottom: 40px;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .buttons-container { display: flex; flex-direction: column; gap: 16px; }
+        .launch-btn {
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        .launch-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .launch-btn:active {
+            transform: translateY(-1px);
+        }
+        .btn-icon { width: 20px; height: 20px; }
+
+        .premium-btn {
+            background: linear-gradient(135deg, var(--color-accent-premium), #c27803);
+            border-color: var(--color-accent-premium);
+            color: var(--color-bg-dark);
+            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+        .premium-btn:hover {
+            background: linear-gradient(135deg, var(--color-accent-premium-hover), var(--color-accent-premium));
+        }
+        .offline-btn {
+            background: var(--color-panel);
+            border-color: var(--color-accent-offline);
+            color: var(--color-accent-offline-hover);
+        }
+        .offline-btn:hover {
+            background: rgba(56, 189, 248, 0.1);
+            color: #fff;
+        }
+        .offline-btn .btn-icon {
+            fill: white;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--color-status-ok);
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .status-dot {
+            width: 10px; height: 10px;
+            background: var(--color-status-ok);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--color-status-ok);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.9); }
+        }
+        
+        /* --- Menú Principal --- */
+        #mainMenuView {
+            flex-direction: row;
+        }
+
+        .main-menu-sidebar {
+            width: 80px;
+            height: 100%;
+            background: rgba(2, 6, 23, 0.7);
+            backdrop-filter: blur(15px);
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            gap: 10px;
+            flex-shrink: 0;
+            z-index: 20;
+        }
+        .sidebar-btn {
+            width: 52px;
+            height: 52px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar-btn:hover {
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+        }
+        .sidebar-btn.active {
+            background: var(--color-accent-offline);
+            color: var(--color-text-primary);
+            box-shadow: 0 0 20px var(--color-accent-offline);
+        }
+        .sidebar-btn:active {
+            transform: scale(0.9);
+        }
+        .sidebar-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+        .sidebar-btn.back-btn {
+            margin-top: auto;
+        }
+
+        .main-menu-content-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .main-menu-content {
+            width: 100%;
+            height: 100%;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+            opacity: 1;
+            visibility: visible;
+        }
+        .main-menu-content.content-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: calc(100% - 80px); /* Ajustar al padding */
+        }
+        .menu-title {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--color-panel);
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--color-border);
+        }
+        .user-skin {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background-color: #000;
+            image-rendering: pixelated;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .user-profile-name {
+            font-weight: 600;
+        }
+        .user-profile-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .user-profile-status.premium { background-color: var(--color-accent-premium); }
+        .user-profile-status.cracked { background-color: var(--color-accent-offline); }
+
+        .play-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .main-logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            filter: drop-shadow(0 0 40px rgba(224, 242, 254, 0.35));
+            animation: logo-glow 4s infinite alternate ease-in-out;
+        }
+        @keyframes logo-glow {
+            from { filter: drop-shadow(0 0 30px rgba(224, 242, 254, 0.3)); }
+            to { filter: drop-shadow(0 0 50px rgba(125, 211, 252, 0.6)); }
+        }
+        .main-logo-icon {
+            width: 200px;
+            height: 200px;
+        }
+        .main-logo-text-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .main-logo-text {
+            font-size: 110px;
+            font-weight: 900;
+            line-height: 0.9;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .discord-button {
+            margin-top: 40px;
+            padding: 20px 60px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            background: var(--color-discord);
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            box-shadow: 0 0 30px rgba(88, 101, 242, 0.5);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .discord-button:hover {
+            background: var(--color-discord-hover);
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(88, 101, 242, 0.7);
+        }
+        .discord-button .btn-icon {
+            width: 32px;
+            height: 32px;
+        }
+
+        .news-section {
+            background: var(--color-panel);
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .news-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border-radius: 16px;
+            padding: 1px;
+            background: linear-gradient(135deg, var(--color-border), transparent 50%);
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+        .news-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .news-item {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        /* --- Pantallas de Carga y Login Cracked --- */
+        .loading-view-content {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 5px solid var(--color-border);
+            border-top-color: var(--color-text-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .username-input {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 18px;
+            color: var(--color-text-primary);
+            text-align: center;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 20px;
+        }
+        .username-input::placeholder {
+            color: var(--color-text-secondary);
+        }
+        .username-input:focus {
+            outline: none;
+            border-color: var(--color-accent-offline);
+        }
+
+        /* --- Vista de Instancias --- */
+        .instances-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+            gap: 20px;
+            padding-top: 60px; /* Espacio para el header */
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .instance-card {
+            background: var(--color-panel);
+            border: 1px solid var(--color-border);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0);
+            transform-style: preserve-3d;
+            min-height: 140px;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+        .instance-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(2, 6, 23, 0.8) 0%, rgba(2, 6, 23, 0.4) 50%, rgba(2, 6, 23, 0) 100%);
+            z-index: 1;
+        }
+        .instance-card-content {
+            position: relative;
+            z-index: 2;
+        }
+        .instance-card:hover {
+            transform: translateY(-5px) rotateX(5deg) scale(1.02);
+            border-color: var(--color-border-hover);
+            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.3);
+        }
+        .instance-card h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .instance-card p {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        /* --- Vista de Juego --- */
+        #instancePlayView {
+            background-size: cover;
+            background-position: center;
+            background-image: url('https://raw.githubusercontent.com/PentaCreators/pixelclient/main/images/prueba.png');
+            flex-direction: row;
+        }
+        .instance-play-content {
+            flex-grow: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 50px;
+        }
+        .install-widget {
+            background: var(--color-panel);
+            border: 1px solid var(--color-border);
+            border-radius: 16px;
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+        .install-widget-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .install-widget p {
+            margin-bottom: 20px;
+            color: var(--color-text-secondary);
+        }
+        .progress-wrapper {
+            transition: opacity 0.3s ease-out, height 0.3s ease-out;
+            opacity: 1;
+            height: 50px; /* Altura aproximada para la animación */
+            overflow: hidden;
+        }
+        .progress-wrapper.hidden-progress {
+            opacity: 0;
+            height: 0;
+        }
+        .progress-details {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 5px;
+            padding: 0 5px;
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            font-family: var(--font-mono);
+        }
+        .progress-bar-container {
+            width: 100%;
+            height: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--color-accent-offline);
+            border-radius: 10px;
+            transition: width 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+            transform: translateX(-100%);
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+        .instance-install-button {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            background-color: var(--color-accent-offline);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+        .instance-install-button.play-mode {
+            background-color: var(--color-play);
+        }
+        .instance-install-button.play-mode:hover {
+            background-color: var(--color-play-hover);
+        }
+        .instance-install-button:hover {
+            background-color: var(--color-accent-offline-hover);
+        }
+        .instance-install-button:disabled {
+            background-color: var(--color-text-secondary);
+            cursor: not-allowed;
+        }
+
+        /* --- Estado de Carga --- */
+        .launch-btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px; height: 20px;
+            right: 24px;
+            border: 3px solid transparent;
+            border-top: 3px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- Sistema de Notificaciones --- */
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 14px 22px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            color: var(--color-text-primary);
+        }
+        .notification.show {
+            transform: translateX(0);
+        }
+        .notification.success { background: var(--color-notification-success); }
+        .notification.error { background: var(--color-notification-error); }
+        .notification.info { background: var(--color-notification-info); }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .header, .footer { padding: 16px 20px; }
+            .app-title { font-size: 16px; }
+            .version-badge, .footer-info { display: none; }
+            .launcher-panel { padding: 32px 24px; }
+            .launcher-title { font-size: 40px; }
+            .main-menu-sidebar { width: 60px; }
+            .main-menu-content-wrapper { padding: 20px; }
+            .menu-header { padding: 0; top: 20px; }
+            .main-logo-icon { width: 80px; height: 80px; }
+            .main-logo-text { font-size: 60px; }
+            .discord-button { padding: 15px 40px; font-size: 20px; }
+            .news-section { left: 20px; right: 20px; bottom: 20px; }
+            .instances-grid { padding: 80px 0 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fondos animados -->
+    <div class="background-container">
+        <canvas id="stars"></canvas>
+        <div class="aurora-container">
+            <div class="aurora-shape shape1"></div>
+            <div class="aurora-shape shape2"></div>
+            <div class="aurora-shape shape3"></div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Vista de Login -->
+        <div id="loginView" class="view">
+            <header class="header">
+                <div class="logo-section">
+                    <div class="logo">
+                        <img src="https://raw.githubusercontent.com/PentaCreators/pixelclient/main/images/logo.png" alt="Logo de Pixel Client">
+                    </div>
+                    <h1 class="app-title">Pixel Club</h1>
+                    <span class="version-badge">v0.1 beta</span>
+                </div>
+                <button class="control-btn close-btn" onclick="closeApp()" title="Cerrar (Esc)" aria-label="Cerrar aplicación">
+                    ✕
+                </button>
+            </header>
+
+            <main class="main-content">
+                <div class="launcher-panel">
+                    <h2 class="launcher-title">Pixel Club</h2>
+                    <p class="launcher-subtitle">Elige tu modo de inicio para una experiencia optimizada</p>
+                    
+                    <div class="buttons-container">
+                        <button type="button" class="launch-btn premium-btn" id="premiumBtn">
+                            <svg class="btn-icon" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="0" y="0" width="10" height="10" fill="#F25022"/>
+                                <rect x="12" y="0" width="10" height="10" fill="#7FBA00"/>
+                                <rect x="0" y="12" width="10" height="10" fill="#00A4EF"/>
+                                <rect x="12" y="12" width="10" height="10" fill="#FFB900"/>
+                            </svg>
+                            Modo Premium
+                        </button>
+                        
+                        <button type="button" class="launch-btn offline-btn" id="crackedBtn">
+                            <svg class="btn-icon" viewBox="0 0 20 20">
+                               <path fill="white" d="M10 2C6.14 2 3 5.14 3 9c0 2.38 1.19 4.47 3 5.74V17a1 1 0 001 1h6a1 1 0 001-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zM7 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm7.5 0a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM7.5 14h5a.5.5 0 010 1h-5a.5.5 0 010-1z"></path>
+                            </svg>
+                            Modo Cracked
+                        </button>
+                    </div>
+                </div>
+            </main>
+
+            <footer class="footer">
+                <div class="footer-info">
+                    © 2025 Pixel Club. Launcher de nueva generación.
+                </div>
+                <div class="footer-controls">
+                    <div class="status-indicator">
+                        <div class="status-dot"></div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Vista de Login Cracked -->
+        <div id="crackedLoginView" class="view hidden">
+            <main class="main-content">
+                <div class="launcher-panel">
+                    <h2 class="launcher-title">Acceso Cracked</h2>
+                    <p class="launcher-subtitle">Introduce tu nombre de usuario para continuar</p>
+                    <input type="text" id="usernameInput" class="username-input" placeholder="Nombre de usuario">
+                    <button type="button" class="launch-btn offline-btn" id="continueCrackedBtn">Continuar</button>
+                </div>
+            </main>
+        </div>
+
+        <!-- Vista de Carga Premium -->
+        <div id="premiumLoadingView" class="view hidden">
+            <div class="loading-view-content">
+                <div class="loading-spinner"></div>
+                <h2 class="launcher-subtitle">Conectando con Microsoft...</h2>
+            </div>
+        </div>
+
+        <!-- Vista del Menú Principal -->
+        <div id="mainMenuView" class="view hidden">
+            <aside class="main-menu-sidebar">
+                <button class="sidebar-btn active" id="homeBtn" title="Inicio">
+                    <svg fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                </button>
+                <button class="sidebar-btn" id="instancesBtn" title="Instancias">
+                    <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-1.57 1.95A1.532 1.532 0 013.17 7.49c-1.56.38-1.56 2.6 0 2.98.63.153 1.047.724.948 1.372-.836 1.372.734 2.942 1.95 1.57a1.532 1.532 0 012.286-.948c.38 1.56 2.6 1.56 2.98 0 .63-.153 1.047-.724.948-1.372 1.372.836 2.942-.734 1.57-1.95a1.532 1.532 0 01-.948-2.286c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286-.948c-1.372.836-2.942-.734-1.57-1.95A1.532 1.532 0 018.51 4.83zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
+                </button>
+                <button class="sidebar-btn" id="settingsBtnMain" title="Configuración">
+                    <svg fill="currentColor" viewBox="0 0 20 20"><path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"></path></svg>
+                </button>
+                <button class="sidebar-btn back-btn" id="backToLoginBtn" title="Cerrar Sesión">
+                    <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L9.414 11H13a1 1 0 100-2H9.414l1.293-1.293z" clip-rule="evenodd"></path></svg>
+                </button>
+            </aside>
+            <div class="main-menu-content-wrapper">
+                <div id="mainMenuContent" class="main-menu-content">
+                    <header class="menu-header">
+                        <h2 class="menu-title">Menú Principal</h2>
+                        <div class="user-profile">
+                            <img id="userSkin" class="user-skin" src="" alt="User Skin">
+                            <div class="user-info">
+                                <span id="userName" class="user-profile-name"></span>
+                                <div id="userStatusIndicator" class="user-profile-status"></div>
+                            </div>
+                        </div>
+                    </header>
+                    <section class="play-section">
+                        <div class="main-logo-container">
+                            <img src="https://raw.githubusercontent.com/PentaCreators/pixelclient/main/images/logo2.png" alt="Pixel Club Logo Icon" class="main-logo-icon">
+                            <div class="main-logo-text-group">
+                                <span class="main-logo-text">PIXEL</span>
+                                <span class="main-logo-text">CLUB</span>
+                            </div>
+                        </div>
+                        <button class="discord-button" id="discordBtn">
+                            <img src="https://raw.githubusercontent.com/PentaCreators/pixelclient/main/images/discordlogo.png" alt="Discord Logo" class="btn-icon">
+                            Discord
+                        </button>
+                    </section>
+                    <section class="news-section">
+                        <h3 class="news-title">Novedades del Launcher</h3>
+                        <p class="news-item">¡Bienvenido a la beta v0.1! Explora las nuevas optimizaciones de rendimiento.</p>
+                    </section>
+                </div>
+                <div id="instancesContent" class="main-menu-content content-hidden">
+                     <header class="menu-header">
+                        <h2 class="menu-title">Instancias</h2>
+                         <div class="user-profile">
+                            <img id="userSkin2" class="user-skin" src="" alt="User Skin">
+                            <div class="user-info">
+                                <span id="userName2" class="user-profile-name"></span>
+                                <div id="userStatusIndicator2" class="user-profile-status"></div>
+                            </div>
+                        </div>
+                    </header>
+                    <div class="instances-grid">
+                        <div class="instance-card" data-background="https://raw.githubusercontent.com/PentaCreators/pixelclient/main/images/prueba.png">
+                            <div class="instance-card-content">
+                                <h3>Squid Games</h3>
+                                <p>¿Podrás sobrevivir a estos juegos?</p>
+                            </div>
+                        </div>
+                        <div class="instance-card">
+                            <div class="instance-card-content">
+                                <h3>Instancia 2</h3>
+                                <p>Descripción de la instancia 2.</p>
+                            </div>
+                        </div>
+                        <div class="instance-card">
+                            <div class="instance-card-content">
+                                <h3>Instancia 3</h3>
+                                <p>Descripción de la instancia 3.</p>
+                            </div>
+                        </div>
+                        <div class="instance-card">
+                            <div class="instance-card-content">
+                                <h3>Instancia 4</h3>
+                                <p>Descripción de la instancia 4.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista de Juego de Instancia -->
+        <div id="instancePlayView" class="view hidden">
+            <aside class="main-menu-sidebar">
+                 <button class="sidebar-btn" id="homeBtnInstanceView" title="Inicio">
+                    <svg fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                </button>
+                <button class="sidebar-btn active" id="instancesBtnInstanceView" title="Instancias">
+                    <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-1.57 1.95A1.532 1.532 0 013.17 7.49c-1.56.38-1.56 2.6 0 2.98.63.153 1.047.724.948 1.372-.836 1.372.734 2.942 1.95 1.57a1.532 1.532 0 012.286-.948c.38 1.56 2.6 1.56 2.98 0 .63-.153 1.047-.724.948-1.372 1.372.836 2.942-.734 1.57-1.95a1.532 1.532 0 01-.948-2.286c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286-.948c-1.372.836-2.942-.734-1.57-1.95A1.532 1.532 0 018.51 4.83zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>
+                </button>
+                <button class="sidebar-btn back-btn" id="backToLoginBtnInstanceView" title="Cerrar Sesión">
+                    <svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.707-10.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L9.414 11H13a1 1 0 100-2H9.414l1.293-1.293z" clip-rule="evenodd"></path></svg>
+                </button>
+            </aside>
+            <main class="instance-play-content">
+                <div class="install-widget">
+                    <h2 id="instanceTitle" class="install-widget-title"></h2>
+                    <p id="instanceDescription"></p>
+                    <div id="progressWrapper" class="progress-wrapper">
+                        <div class="progress-details">
+                            <span id="progressPercentage">0%</span>
+                            <span id="progressStatus"></span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div id="installProgressBar" class="progress-bar"></div>
+                        </div>
+                    </div>
+                    <button id="installBtn" class="instance-install-button">INSTALAR</button>
+                </div>
+            </main>
+        </div>
+        
+        <!-- Modal de Configuración -->
+        <div id="settingsModal" class="view hidden" style="background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); z-index: 100;">
+            <main class="main-content">
+                <div class="launcher-panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px;">
+                        <h2 class="launcher-title" style="font-size: 36px; margin: 0;">Configuración</h2>
+                        <button class="control-btn close-btn" id="closeModalBtn">✕</button>
+                    </div>
+                    <div style="text-align: left; width: 100%;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                            <label for="ram-slider">Asignación de RAM:</label>
+                            <span id="ram-value">4 GB</span>
+                        </div>
+                        <input type="range" id="ram-slider" min="2" max="16" value="4" step="1" style="width: 100%; margin-top: 10px;">
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Selección de Elementos del DOM ---
+            const loginView = document.getElementById('loginView');
+            const mainMenuView = document.getElementById('mainMenuView');
+            const crackedLoginView = document.getElementById('crackedLoginView');
+            const premiumLoadingView = document.getElementById('premiumLoadingView');
+            const instancePlayView = document.getElementById('instancePlayView');
+            const settingsModal = document.getElementById('settingsModal');
+            
+            const premiumBtn = document.getElementById('premiumBtn');
+            const crackedBtn = document.getElementById('crackedBtn');
+            const continueCrackedBtn = document.getElementById('continueCrackedBtn');
+            const usernameInput = document.getElementById('usernameInput');
+
+            const backToLoginBtn = document.getElementById('backToLoginBtn');
+            const backToLoginBtnInstanceView = document.getElementById('backToLoginBtnInstanceView');
+            
+            const userSkin = document.getElementById('userSkin');
+            const userNameDisplay = document.getElementById('userName');
+            const userStatusIndicator = document.getElementById('userStatusIndicator');
+            const userSkin2 = document.getElementById('userSkin2');
+            const userNameDisplay2 = document.getElementById('userName2');
+            const userStatusIndicator2 = document.getElementById('userStatusIndicator2');
+
+            const homeBtn = document.getElementById('homeBtn');
+            const instancesBtn = document.getElementById('instancesBtn');
+            const settingsBtnMain = document.getElementById('settingsBtnMain');
+            const homeBtnInstanceView = document.getElementById('homeBtnInstanceView');
+            const instancesBtnInstanceView = document.getElementById('instancesBtnInstanceView');
+            const mainMenuContent = document.getElementById('mainMenuContent');
+            const instancesContent = document.getElementById('instancesContent');
+            const discordBtn = document.getElementById('discordBtn');
+
+            const installBtn = document.getElementById('installBtn');
+            const installProgressBar = document.getElementById('installProgressBar');
+            const progressPercentage = document.getElementById('progressPercentage');
+            const progressStatus = document.getElementById('progressStatus');
+            const progressWrapper = document.getElementById('progressWrapper');
+            const instanceTitle = document.getElementById('instanceTitle');
+            const instanceDescription = document.getElementById('instanceDescription');
+
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const ramSlider = document.getElementById('ram-slider');
+            const ramValue = document.getElementById('ram-value');
+
+            // --- Funciones de cambio de vista ---
+            const showView = (viewToShow) => {
+                document.querySelectorAll('.view').forEach(view => view.classList.add('hidden'));
+                viewToShow.classList.remove('hidden');
+            };
+
+            const showMainContent = (contentToShow) => {
+                [mainMenuContent, instancesContent].forEach(content => content.classList.add('content-hidden'));
+                contentToShow.classList.remove('content-hidden');
+                
+                [homeBtn, instancesBtn].forEach(btn => btn.classList.remove('active'));
+                if (contentToShow === mainMenuContent) {
+                    homeBtn.classList.add('active');
+                } else {
+                    instancesBtn.classList.add('active');
+                }
+            };
+            
+            // --- Lógica de Inicio de Sesión ---
+            const setupUser = (name, type) => {
+                let skinUrl;
+                if (type === 'premium') {
+                    skinUrl = `https://cravatar.eu/helmavatar/Notch/64.png`;
+                } else {
+                    skinUrl = `https://cravatar.eu/helmavatar/Steve/64.png`;
+                }
+                
+                userSkin.src = skinUrl;
+                userNameDisplay.textContent = name;
+                userStatusIndicator.className = `user-profile-status ${type}`;
+                
+                userSkin2.src = skinUrl;
+                userNameDisplay2.textContent = name;
+                userStatusIndicator2.className = `user-profile-status ${type}`;
+            };
+
+            const startPremiumLogin = async () => {
+                showView(premiumLoadingView);
+                await new Promise(resolve => setTimeout(resolve, 2500));
+                
+                setupUser("Notch", "premium");
+                showView(mainMenuView);
+                showMainContent(mainMenuContent);
+                showNotification('¡Sesión Premium iniciada con éxito!', 'success');
+            };
+
+            const startCrackedLogin = () => {
+                const username = usernameInput.value.trim();
+                if (username) {
+                    setupUser(username, "cracked");
+                    showView(mainMenuView);
+                    showMainContent(mainMenuContent);
+                    showNotification(`¡Bienvenido, ${username}!`, 'success');
+                } else {
+                    showNotification('Por favor, introduce un nombre de usuario.', 'error');
+                }
+            };
+
+            // --- Lógica de Instalación ---
+            const startInstallation = () => {
+                installBtn.textContent = "Instalando...";
+                installBtn.disabled = true;
+                installBtn.classList.remove('play-mode');
+                progressWrapper.classList.remove('hidden-progress');
+
+                const steps = ["Descargando archivos...", "Instalando librerías...", "Verificando...", "Finalizando..."];
+                let progress = 0;
+                let stepIndex = 0;
+                progressStatus.textContent = steps[stepIndex];
+
+                const interval = setInterval(() => {
+                    progress += 2;
+                    installProgressBar.style.width = `${progress}%`;
+                    progressPercentage.textContent = `${progress}%`;
+                    
+                    if (progress % 25 === 0 && progress < 100) {
+                        stepIndex++;
+                        progressStatus.textContent = steps[stepIndex];
+                    }
+
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        installBtn.textContent = "JUGAR";
+                        installBtn.disabled = false;
+                        installBtn.classList.add('play-mode');
+                        progressWrapper.classList.add('hidden-progress');
+                    }
+                }, 50);
+            };
+
+            // --- Lógica del Modal de Configuración ---
+            const toggleSettingsModal = (show) => {
+                if (show) {
+                    settingsModal.classList.remove('hidden');
+                } else {
+                    settingsModal.classList.add('hidden');
+                }
+            };
+
+            // --- Asignación de Eventos a los Botones ---
+            premiumBtn.addEventListener('click', startPremiumLogin);
+            crackedBtn.addEventListener('click', () => showView(crackedLoginView));
+            continueCrackedBtn.addEventListener('click', startCrackedLogin);
+            
+            const logout = () => {
+                showView(loginView);
+                usernameInput.value = ""; // Limpiar el campo
+            };
+            backToLoginBtn.addEventListener('click', logout);
+            backToLoginBtnInstanceView.addEventListener('click', logout);
+            
+            homeBtn.addEventListener('click', () => showMainContent(mainMenuContent));
+            instancesBtn.addEventListener('click', () => showMainContent(instancesContent));
+            settingsBtnMain.addEventListener('click', () => toggleSettingsModal(true));
+            homeBtnInstanceView.addEventListener('click', () => {
+                showView(mainMenuView);
+                showMainContent(mainMenuContent);
+            });
+            instancesBtnInstanceView.addEventListener('click', () => {
+                showView(mainMenuView);
+                showMainContent(instancesContent);
+            });
+
+            discordBtn.addEventListener('click', () => {
+                window.open('https://discord.gg/BxjGkEed', '_blank');
+            });
+
+
+            usernameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') startCrackedLogin();
+            });
+
+            document.querySelectorAll('.instance-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const title = card.querySelector('h3').textContent;
+                    const description = card.querySelector('p').textContent;
+                    const background = card.dataset.background;
+                    
+                    instanceTitle.textContent = title;
+                    instanceDescription.textContent = description;
+
+                    if (background) {
+                        instancePlayView.style.backgroundImage = `url('${background}')`;
+                    } else {
+                        instancePlayView.style.backgroundImage = `url('https://placehold.co/1920x1080/020617/e0f2fe?text=Fondo+del+Evento')`;
+                    }
+
+                    installProgressBar.style.width = '0%';
+                    progressPercentage.textContent = '0%';
+                    progressStatus.textContent = '';
+                    installBtn.textContent = 'INSTALAR';
+                    installBtn.disabled = false;
+                    installBtn.classList.remove('play-mode');
+                    progressWrapper.classList.remove('hidden-progress');
+
+                    showView(instancePlayView);
+                });
+            });
+
+            installBtn.addEventListener('click', () => {
+                if (installBtn.textContent === 'INSTALAR') {
+                    startInstallation();
+                } else if (installBtn.textContent === 'JUGAR') {
+                    showNotification('Iniciando el juego...', 'success');
+                }
+            });
+
+            closeModalBtn.addEventListener('click', () => toggleSettingsModal(false));
+            settingsModal.addEventListener('click', (e) => {
+                if (e.target === settingsModal) {
+                    toggleSettingsModal(false);
+                }
+            });
+            ramSlider.addEventListener('input', (e) => {
+                ramValue.textContent = `${e.target.value} GB`;
+            });
+
+            // --- Sistema de Notificaciones ---
+            const showNotification = (message, type = 'info') => {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                setTimeout(() => notification.classList.add('show'), 10);
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    notification.addEventListener('transitionend', () => notification.remove());
+                }, 4000);
+            };
+
+            // --- Función para Cerrar la Aplicación (simulada) ---
+            window.closeApp = () => {
+                showNotification('Cerrando la aplicación...', 'info');
+            };
+            
+            // --- Animación de Estrellas ---
+            const canvas = document.getElementById('stars');
+            const ctx = canvas.getContext('2d');
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            const stars = [];
+            for (let i = 0; i < 100; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5,
+                    vx: Math.floor(Math.random() * 50) - 25,
+                    vy: Math.floor(Math.random() * 50) - 25
+                });
+            }
+
+            function drawStars() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.globalCompositeOperation = "lighter";
+
+                for (let i = 0, x = stars.length; i < x; i++) {
+                    const s = stars[i];
+                    ctx.fillStyle = "#fff";
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.radius, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            }
+
+            function updateStars() {
+                for (let i = 0, x = stars.length; i < x; i++) {
+                    let s = stars[i];
+                    s.x += s.vx / 60;
+                    s.y += s.vy / 60;
+
+                    if (s.x < 0 || s.x > canvas.width) s.vx = -s.vx;
+                    if (s.y < 0 || s.y > canvas.height) s.vy = -s.vy;
+                }
+            }
+            
+            function tick() {
+                drawStars();
+                updateStars();
+                requestAnimationFrame(tick);
+            }
+            
+            tick();
+
+
+            // --- Notificación de Bienvenida ---
+            setTimeout(() => {
+                showNotification('¡Bienvenido a Pixel Club v0.1 beta!', 'success');
+            }, 500);
+        });
+    </script>
+</body>
+</html>
