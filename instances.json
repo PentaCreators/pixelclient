@@ -2,9 +2,14 @@
   {
     "id": "squid_games",
     "name": "Squid Games",
-    "description": "¿Podrás sobrevivir a estos juegos?",
-    "background": "https://raw.githubusercontent.com/TU_USUARIO/TU_REPO/main/squid_games/background.png",
-    "cover": "https://raw.githubusercontent.com/TU_USUARIO/TU_REPO/main/squid_games/portada.png",
-    "instance_json": "https://raw.githubusercontent.com/TU_USUARIO/TU_REPO/main/squid_games/instance.json"
+    "description": "Will you survive these games?",
+    "background": "https://raw.githubusercontent.com/PentaCreators/pixelclient/main/squid_games/background.png",
+    "cover": "https://raw.githubusercontent.com/PentaCreators/pixelclient/main/squid_games/portada.png",
+    "version": "1.20.1",
+    "loader": "forge",
+    "loader_version": "47.4.0",
+    "installer": "https://raw.githubusercontent.com/PentaCreators/pixelclient/main/forge-installer.jar",
+    "download_url": "https://github.com/PentaCreators/pixelclient/releases/download/v0.2/squid_games_files.zip",
+    "last_update": "2025-08-11"
   }
 ]
