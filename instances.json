@@ -1,16 +1,14 @@
-[
-  {
-    "id": "squid_games",
-    "name": "Squid Games",
-    "description": "Will you survive these games?",
-    "background": "https://raw.githubusercontent.com/PentaCreators/pixelclient/main/squid_games/background.png",
-    "cover": "https://raw.githubusercontent.com/PentaCreators/pixelclient/main/squid_games/portada.png",
-    "version": "1.20.1",
-    "loader": "forge",
-    "loader_version": "47.4.0",
-    "version_json_url": "https://raw.githubusercontent.com/PentaCreators/pixelclient/main/locaso/1.20.1-forge-47.4.0.json",
-    "version_jar_url": "https://raw.githubusercontent.com/PentaCreators/pixelclient/main/locaso/1.20.1-forge-47.4.0.jar",
-    "files_zip_url": "https://github.com/PentaCreators/pixelclient/releases/download/v0.2/modssquid.zip",
-    "last_update": "2025-08-11"
-  }
-]
+{
+  "id": "squid_games",
+  "name": "Squid Games", 
+  "description": "¿Podrás sobrevivir a estos juegos?",
+  "background": "https://raw.githubusercontent.com/PentaCreators/pixelclient/main/squid_games/background.png",
+  "cover": "https://raw.githubusercontent.com/PentaCreators/pixelclient/main/squid_games/portada.png",
+  "version": "1.20.1",
+  "loader": "forge",
+  "loader_version": "47.4.0",
+  "forge_installer_url": "https://github.com/PentaCreators/pixelclient/blob/main/forge-installer.jar",
+  "files_zip_url": "https://github.com/PentaCreators/pixelclient/releases/download/v0.3/modssquid.zip",
+  "installed_version": "0.3",
+  "last_update": "2025-08-16"
+}
